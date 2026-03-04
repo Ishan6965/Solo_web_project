@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Dashboard</title>
+
+    <style>
+        /* Reset default spacing */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Page background */
+        body {
+            background-color: #00d9d9;
+            text-align: center;
+        }
+
+        /* Welcome header */
+        .welcome {
+            background-color: limegreen;
+            padding: 20px;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        /* Dashboard title */
+        .dashboard {
+            background-color: purple;
+            color: white;
+            padding: 20px;
+            font-size: 26px;
+            font-weight: bold;
+        }
+
+        /* Image section */
+        .image-container {
+            margin: 40px 0;
+        }
+
+        .image-container img {
+            width: 40%;
+            max-width: 400px;
+            border: 6px solid black;
+        }
+
+        /* Login/Register button */
+        .action {
+            margin: 40px 0;
+        }
+
+        .action a {
+            background-color: #7b3f00;
+            color: white;
+            text-decoration: none;
+            padding: 15px 40px;
+            font-size: 20px;
+            font-weight: bold;
+            display: inline-block;
+        }
+
+        .action a:hover {
+            opacity: 0.85;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Welcome -->
+    <div class="welcome">
+        WELCOME
+    </div>
+
+    <!-- Dashboard -->
+    <div class="dashboard">
+        DASHBOARD
+    </div>
+
+    <!-- Theater image -->
+    <div class="image-container">
+        <img src="assets/images/1.png" alt="Movie Theater">
+    </div>
+
+    <!-- Login/Register -->
+    <div class="action">
+        <a href="login.html" id="start-auth">LOGIN / REGISTER</a>
+    </div>
+
+    <script src="assets/js/auth.js"></script>
+    <script>
+        document.getElementById("start-auth").addEventListener("click", () => {
+            Auth.markFlowStarted();
+        });
+    </script>
+</body>
+</html>
