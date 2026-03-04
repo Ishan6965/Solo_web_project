@@ -1,24 +1,40 @@
-import mongoose from "mongoose";
+import pg from "pg";
 
-const MONGODB_URI =
-  process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/movie_dashboard";
+const { Pool } = pg;
+
+const DATABASE_URL =
+  process.env.DATABASE_URL || "postgresql://postgres:postgres@localhost:5432/movie_dashboard";
+
+const isProduction = process.env.NODE_ENV === "production";
+
+export const pool = new Pool({
+  connectionString: DATABASE_URL,
+  ssl: isProduction ? { rejectUnauthorized: false } : false
+});
 
 export async function connectDb() {
   try {
-    await mongoose.connect(MONGODB_URI);
-    console.log("MongoDB connected");
+    const client = await pool.connect();
+    client.release();
+    console.log("PostgreSQL connected");
   } catch (error) {
-    console.error("MongoDB connection error:", error.message);
+    console.error("PostgreSQL connection error:", error.message);
     process.exit(1);
   }
 }
 
-const userSchema = new mongoose.Schema(
-  {
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true }
-  },
-  { timestamps: true }
-);
-
-export const User = mongoose.model("User", userSchema);
+export async function initializeDb() {
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        email TEXT UNIQUE NOT NULL,
+        password TEXT NOT NULL,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `);
+  } catch (error) {
+    console.error("PostgreSQL init error:", error.message);
+    process.exit(1);
+  }
+}

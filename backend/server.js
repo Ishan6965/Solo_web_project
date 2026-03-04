@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
-import { connectDb, User } from "./db.js";
+import "dotenv/config";
+import { connectDb, initializeDb, pool } from "./db.js";
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
@@ -23,13 +24,16 @@ app.post("/register", async (req, res) => {
   }
 
   try {
-    const existing = await User.findOne({ email });
-    if (existing) {
+    const existing = await pool.query("SELECT id FROM users WHERE email = $1", [email]);
+    if (existing.rowCount > 0) {
       return res.status(400).json({ error: "User already exists." });
     }
 
-    const user = await User.create({ email, password });
-    return res.json({ message: "Account created", userId: user._id });
+    const inserted = await pool.query(
+      "INSERT INTO users (email, password) VALUES ($1, $2) RETURNING id",
+      [email, password]
+    );
+    return res.json({ message: "Account created", userId: inserted.rows[0].id });
   } catch (error) {
     return res.status(500).json({ error: "Database error." });
   }
@@ -43,17 +47,26 @@ app.post("/login", async (req, res) => {
   }
 
   try {
-    const user = await User.findOne({ email, password }).select("_id email");
-    if (!user) {
+    const result = await pool.query(
+      "SELECT id, email FROM users WHERE email = $1 AND password = $2",
+      [email, password]
+    );
+    if (result.rowCount === 0) {
       return res.status(401).json({ error: "Invalid credentials." });
     }
-    return res.json({ message: "Login success", user });
+
+    const user = result.rows[0];
+    return res.json({
+      message: "Login success",
+      user: { _id: String(user.id), email: user.email }
+    });
   } catch (error) {
     return res.status(500).json({ error: "Database error." });
   }
 });
 
-connectDb().then(() => {
+connectDb().then(async () => {
+  await initializeDb();
   app.listen(PORT, () => {
     console.log(`API running on http://localhost:${PORT}`);
   });

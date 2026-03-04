@@ -23,6 +23,6 @@ echo Opening frontend...
 start "" "%~dp0index.html"
 
 echo.
-echo If login still says it cannot connect, verify MongoDB is running.
+echo If login still says it cannot connect, verify PostgreSQL is running.
 echo.
 endlocal
